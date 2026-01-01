@@ -1,0 +1,23 @@
+cat > .gitignore << 'EOF'
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+override.tf
+*_override.tf
+
+# Ansible
+*.retry
+
+# Secrets and keys
+*.pem
+*.key
+*.pub
+
+# OS junk
+.DS_Store
+Thumbs.db
+EOF
