@@ -2,7 +2,14 @@
 resource "yandex_vpc_security_group" "sg-web" {
   name        = "sg-web"
   description = "Разрешает HTTP от ALB и health checks"
-  network_id  = yandex_vpc_network.coursework.id
+  network_id = yandex_vpc_network.coursework.id
+
+ingress {
+    protocol          = "TCP"
+    description       = "HTTP от ALB"
+    port              = 80
+    security_group_id = yandex_vpc_security_group.sg-alb.id
+  }
 
   ingress {
     protocol       = "TCP"
@@ -12,9 +19,9 @@ resource "yandex_vpc_security_group" "sg-web" {
   }
 
   ingress {
-    protocol       = "TCP"
-    description    = "SSH только с bastion"
-    port           = 22
+    protocol          = "TCP"
+    description       = "SSH только с bastion"
+    port              = 22
     security_group_id = yandex_vpc_security_group.sg-private.id
   }
 
@@ -46,8 +53,8 @@ resource "yandex_compute_instance" "web1" {
   }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.private-a.id
-    nat                = false
+    subnet_id = yandex_vpc_subnet.private-a.id
+    nat       = false
     security_group_ids = [
       yandex_vpc_security_group.sg-private.id,
       yandex_vpc_security_group.sg-web.id
@@ -82,8 +89,8 @@ resource "yandex_compute_instance" "web2" {
   }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.private-b.id
-    nat                = false
+    subnet_id = yandex_vpc_subnet.private-b.id
+    nat       = false
     security_group_ids = [
       yandex_vpc_security_group.sg-private.id,
       yandex_vpc_security_group.sg-web.id

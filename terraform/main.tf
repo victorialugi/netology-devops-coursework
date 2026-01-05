@@ -2,7 +2,7 @@ data "yandex_compute_image" "ubuntu" {
   family = "ubuntu-2204-lts"
 }
 
-# VPC
+# VPC сеть
 resource "yandex_vpc_network" "coursework" {
   name = "coursework-net"
 }
@@ -43,8 +43,6 @@ resource "yandex_vpc_security_group" "sg-bastion" {
 
   egress {
     protocol       = "ANY"
-    from_port      = 0
-    to_port        = 65535
     v4_cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -62,13 +60,11 @@ resource "yandex_vpc_security_group" "sg-private" {
 
   egress {
     protocol       = "ANY"
-    from_port      = 0
-    to_port        = 65535
     v4_cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-# Bastion host
+# Bastion host (в публичной подсети public-a)
 resource "yandex_compute_instance" "bastion" {
   name        = "bastion"
   zone        = "ru-central1-a"
@@ -95,13 +91,8 @@ resource "yandex_compute_instance" "bastion" {
   }
 
   metadata = {
-    user-data = <<-EOF
-      #cloud-config
-      users:
-        - name: ubuntu
-          sudo: ALL=(ALL) NOPASSWD:ALL
-          ssh_authorized_keys:
-            - ${var.ssh_public_key}
-      EOF
+    user-data = templatefile("${path.module}/cloud-init.yml", {
+      ssh_public_key = var.ssh_public_key
+    })
   }
 }
