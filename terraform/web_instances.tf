@@ -1,3 +1,31 @@
+# Security Group для веб-серверов
+resource "yandex_vpc_security_group" "sg-web" {
+  name        = "sg-web"
+  description = "Разрешает HTTP от ALB и health checks"
+  network_id  = yandex_vpc_network.coursework.id
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Health checks от Yandex ALB"
+    port           = 80
+    v4_cidr_blocks = ["198.18.235.0/24", "198.18.239.0/24"]
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "SSH только с bastion"
+    port           = 22
+    security_group_id = yandex_vpc_security_group.sg-private.id
+  }
+
+  egress {
+    protocol       = "ANY"
+    description    = "Исходящий трафик"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Веб-сервер 1 (зона a)
 resource "yandex_compute_instance" "web1" {
   name        = "web1"
   zone        = "ru-central1-a"
@@ -11,7 +39,7 @@ resource "yandex_compute_instance" "web1" {
 
   boot_disk {
     initialize_params {
-      image_id = data.yandex_compute_image.ubuntu.id
+      image_id = data.yandex_compute_image.ubuntu.image_id
       size     = 20
       type     = "network-ssd"
     }
@@ -20,24 +48,20 @@ resource "yandex_compute_instance" "web1" {
   network_interface {
     subnet_id          = yandex_vpc_subnet.private-a.id
     nat                = false
-    security_group_ids = [yandex_vpc_security_group.sg-private.id]
+    security_group_ids = [
+      yandex_vpc_security_group.sg-private.id,
+      yandex_vpc_security_group.sg-web.id
+    ]
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${file(\"~/.ssh/id_ed25519.pub\")}"
-    user-data = <<-EOT
-      #cloud-config
-      package_update: true
-      packages:
-        - nginx
-      runcmd:
-        - echo "<h1>Hello from web1 (zone a)</h1><p>Server: $(hostname)</p>" > /var/www/html/index.nginx-debian.html
-        - systemctl enable nginx
-        - systemctl restart nginx
-      EOT
+    user-data = templatefile("${path.module}/cloud-init.yml", {
+      ssh_public_key = var.ssh_public_key
+    })
   }
 }
 
+# Веб-сервер 2 (зона b)
 resource "yandex_compute_instance" "web2" {
   name        = "web2"
   zone        = "ru-central1-b"
@@ -51,7 +75,7 @@ resource "yandex_compute_instance" "web2" {
 
   boot_disk {
     initialize_params {
-      image_id = data.yandex_compute_image.ubuntu.id
+      image_id = data.yandex_compute_image.ubuntu.image_id
       size     = 20
       type     = "network-ssd"
     }
@@ -60,20 +84,15 @@ resource "yandex_compute_instance" "web2" {
   network_interface {
     subnet_id          = yandex_vpc_subnet.private-b.id
     nat                = false
-    security_group_ids = [yandex_vpc_security_group.sg-private.id]
+    security_group_ids = [
+      yandex_vpc_security_group.sg-private.id,
+      yandex_vpc_security_group.sg-web.id
+    ]
   }
 
   metadata = {
-    ssh-keys = "ubuntu:${file(\"~/.ssh/id_ed25519.pub\")}"
-    user-data = <<-EOT
-      #cloud-config
-      package_update: true
-      packages:
-        - nginx
-      runcmd:
-        - echo "<h1>Hello from web2 (zone b)</h1><p>Server: $(hostname)</p>" > /var/www/html/index.nginx-debian.html
-        - systemctl enable nginx
-        - systemctl restart nginx
-      EOT
+    user-data = templatefile("${path.module}/cloud-init.yml", {
+      ssh_public_key = var.ssh_public_key
+    })
   }
 }
