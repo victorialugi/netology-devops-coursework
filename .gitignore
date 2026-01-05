@@ -21,3 +21,4 @@ override.tf
 .DS_Store
 Thumbs.db
 EOF
+ansible/inventory.yml
