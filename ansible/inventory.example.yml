@@ -1,0 +1,18 @@
+all:
+  children:
+    webservers:
+      hosts:
+        web1:
+          ansible_host: 192.xxx.xx.x
+        web2:
+          ansible_host: 192.xxx.xx.xx
+      vars:
+        ansible_user: ubuntu
+        ansible_ssh_private_key_file: /home/victoria_luginina/.ssh/id_ed25519
+        ansible_ssh_common_args: >-
+          -o ProxyJump=ubuntu@158.xxx.xx.xx
+          -o StrictHostKeyChecking=no
+          -o UserKnownHostsFile=/dev/null
+          -o ServerAliveInterval=30
+          -o ServerAliveCountMax=6
+          -o ConnectTimeout=10
