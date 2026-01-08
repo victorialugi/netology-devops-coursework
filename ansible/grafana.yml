@@ -1,0 +1,32 @@
+---
+- name: Install Docker and run Grafana on grafana server
+  hosts: grafana
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Add ubuntu to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Run Grafana container
+      docker_container:
+        name: grafana
+        image: grafana/grafana:latest
+        state: started
+        restart_policy: always
+        published_ports:
+          - "3000:3000"
+        volumes:
+          - grafana-data:/var/lib/grafana
+        env:
+          GF_SECURITY_ADMIN_PASSWORD: admin
+
+    - name: Create grafana data volume
+      docker_volume:
+        name: grafana-data

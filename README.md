@@ -32,3 +32,13 @@
   - `ansible/inventory.yml` — локальный файл с реальными IP (в .gitignore)
 
 Доступ к приватным серверам через bastion.
+
+
+### Мониторинг
+
+- Node Exporter установлен на всех ВМ (web1, web2, bastion, prometheus, grafana) — метрики системы (CPU, RAM, диск, сеть).
+- Prometheus в Docker на bastion — собирает метрики с Node Exporter.
+- Grafana в Docker на ВМ grafana  — дашборд Node Exporter Full (ID 1860).
+- Доступ к Grafana: http://<grafana_public_ip>:3000.
+
+Скрины прилагаются.

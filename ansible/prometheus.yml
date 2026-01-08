@@ -1,0 +1,55 @@
+---
+- name: Install Docker and run Prometheus on prometheus server
+  hosts: bastion
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Add ubuntu to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Create prometheus config directory
+      file:
+        path: /etc/prometheus
+        state: directory
+        mode: '0755'
+
+    - name: Create prometheus.yml config
+      copy:
+        content: |
+          global:
+            scrape_interval: 15s
+
+          scrape_configs:
+            - job_name: 'node'
+              static_configs:
+                - targets:
+                  - 'localhost:9100'
+                  - 'WEB1_PRIVATE_IP:9100'
+                  - 'WEB2_PRIVATE_IP:9100'
+                  - 'GRAFANA_PUBLIC_IP:9100'
+                  - 'BASTION_PUBLIC_IP:9100'
+        dest: /etc/prometheus/prometheus.yml
+        mode: '0644'
+
+    - name: Run Prometheus container
+      docker_container:
+        name: prometheus
+        image: prom/prometheus:latest
+        state: started
+        restart_policy: always
+        published_ports:
+          - "9090:9090"
+        volumes:
+          - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+          - prometheus-data:/prometheus
+
+    - name: Create prometheus data volume
+      docker_volume:
+        name: prometheus-data
