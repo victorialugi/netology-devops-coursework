@@ -51,3 +51,14 @@
 - Elasticsearch в Docker на ВМ kibana — хранит логи (single-node).
 - Kibana в Docker на ВМ kibana (публичный IP) — просмотр логов.
 - Доступ к Kibana: http://<kibana_public_ip>:5601
+
+
+
+### Резервное копирование (Snapshots)
+
+- Ежедневные снапшоты дисков всех ВМ (bastion, web1, web2, prometheus, grafana, elasticsearch, kibana).
+- Расписание: ежедневно в 2:00 ночи.
+- Время жизни: 7 дней.
+- Настройка: Terraform ресурс `yandex_compute_snapshot_schedule` в файле `terraform/snapshots.tf`.
+
+Скрины Yandex Console → Snapshot schedules прилагаются.
