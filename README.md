@@ -43,6 +43,11 @@
 
 Скрины прилагаются.
 
+![1_monitoring.png](https://github.com/victorialugi/netology-devops-coursework/blob/main/1_monitoring.png)
+![2_monitoring_prometheus.png](https://github.com/victorialugi/netology-devops-coursework/blob/main/2_monitoring_prometheus.png)
+![3_monitoring_grafana.png](https://github.com/victorialugi/netology-devops-coursework/blob/main/3_monitoring_grafana.png)
+![4_monitoring_grafana.png](https://github.com/victorialugi/netology-devops-coursework/blob/main/4_monitoring_grafana.png)
+![5_monitoring_grafana.png](https://github.com/victorialugi/netology-devops-coursework/blob/main/5_monitoring_grafana.png)
 
 
 ### Логи
@@ -54,11 +59,11 @@
 
 
 
-### Резервное копирование (Snapshots)
+### Резервное копирование
 
 - Ежедневные снапшоты дисков всех ВМ (bastion, web1, web2, prometheus, grafana, elasticsearch, kibana).
-- Расписание: ежедневно в 2:00 ночи.
-- Время жизни: 7 дней.
 - Настройка: Terraform ресурс `yandex_compute_snapshot_schedule` в файле `terraform/snapshots.tf`.
 
-Скрины Yandex Console → Snapshot schedules прилагаются.
+Скрин Yandex Console Snapshot schedules прилагается.
+
+![6_daily_snapshots.png](https://github.com/victorialugi/netology-devops-coursework/blob/main/6_daily_snapshots.png)
