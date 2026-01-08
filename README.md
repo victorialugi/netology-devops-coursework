@@ -42,3 +42,12 @@
 - Доступ к Grafana: http://<grafana_public_ip>:3000.
 
 Скрины прилагаются.
+
+
+
+### Логи
+
+- Filebeat в Docker на web-серверах — собирает /var/log/nginx/access.log и error.log.
+- Elasticsearch в Docker на ВМ kibana — хранит логи (single-node).
+- Kibana в Docker на ВМ kibana (публичный IP) — просмотр логов.
+- Доступ к Kibana: http://<kibana_public_ip>:5601

@@ -1,0 +1,33 @@
+---
+- name: Install Filebeat on web servers
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Add ubuntu to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Run Filebeat in Docker
+      docker_container:
+        name: filebeat
+        image: docker.elastic.co/beats/filebeat:8.15.2
+        state: started
+        restart_policy: always
+        volumes:
+          - /var/log/nginx:/var/log/nginx:ro
+          - filebeat-data:/usr/share/filebeat/data
+        env:
+          ELASTICSEARCH_HOST: http://ELASTICSEARCH_PRIVATE_IP:9200
+          LOG_LEVEL: info
+        command: filebeat -e -strict.perms=false
+
+    - name: Create filebeat data volume
+      docker_volume:
+        name: filebeat-data

@@ -1,0 +1,44 @@
+---
+- name: Run Elasticsearch and Kibana in Docker
+  hosts: logging
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Add ubuntu to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Run Elasticsearch container
+      docker_container:
+        name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+        state: started
+        restart_policy: always
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: "false"
+        published_ports:
+          - "9200:9200"
+        volumes:
+          - es-data:/usr/share/elasticsearch/data
+
+    - name: Run Kibana container
+      docker_container:
+        name: kibana
+        image: docker.elastic.co/kibana/kibana:8.15.2
+        state: started
+        restart_policy: always
+        published_ports:
+          - "5601:5601"
+        env:
+          ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+
+    - name: Create es-data volume
+      docker_volume:
+        name: es-data
