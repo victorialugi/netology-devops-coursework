@@ -36,9 +36,23 @@ resource "yandex_vpc_security_group" "sg-bastion" {
 
   ingress {
     protocol       = "TCP"
+    description    = "Prometheus UI из интернета (для Grafana)"
+    port           = 9090
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    protocol       = "TCP"
     description    = "SSH из интернета (временно)"
     port           = 22
     v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Node Exporter от bastion (для Prometheus)"
+    port           = 9100
+    v4_cidr_blocks = ["BASTION_PUBLIC_IP/32"]
   }
 
   egress {
@@ -56,6 +70,13 @@ resource "yandex_vpc_security_group" "sg-private" {
     description       = "SSH только с bastion"
     port              = 22
     security_group_id = yandex_vpc_security_group.sg-bastion.id
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Node Exporter от bastion (для Prometheus)"
+    port           = 9100
+    v4_cidr_blocks = ["BASTION_PUBLIC_IP/32"]
   }
 
   egress {

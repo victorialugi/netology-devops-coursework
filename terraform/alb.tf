@@ -10,7 +10,7 @@ resource "yandex_vpc_security_group" "sg-alb" {
     v4_cidr_blocks = ["198.18.235.0/24", "198.18.239.0/24"]
   }
 
-ingress {
+  ingress {
     protocol       = "TCP"
     description    = "Health checks балансера (порт 30080 от Yandex)"
     port           = 30080

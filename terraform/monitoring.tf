@@ -30,7 +30,7 @@ resource "yandex_vpc_security_group" "sg-grafana" {
   description = "Порт 3000 из интернета"
   network_id  = yandex_vpc_network.coursework.id
 
-ingress {
+  ingress {
     protocol       = "TCP"
     description    = "SSH из интернета (временно для Ansible)"
     port           = 22
@@ -51,7 +51,7 @@ ingress {
     security_group_id = yandex_vpc_security_group.sg-private.id
   }
 
-ingress {
+  ingress {
     protocol          = "TCP"
     description       = "SSH от bastion"
     port              = 22

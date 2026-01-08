@@ -2,9 +2,9 @@
 resource "yandex_vpc_security_group" "sg-web" {
   name        = "sg-web"
   description = "Разрешает HTTP от ALB и health checks"
-  network_id = yandex_vpc_network.coursework.id
+  network_id  = yandex_vpc_network.coursework.id
 
-ingress {
+  ingress {
     protocol          = "TCP"
     description       = "HTTP от ALB"
     port              = 80
